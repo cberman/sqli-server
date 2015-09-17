@@ -9,7 +9,9 @@ index_html = open(os.path.join(html_dir, 'index.html')).read()
 register_html = open(os.path.join(html_dir, 'register.html')).read()
 data_dir = os.path.join(os.path.dirname(__file__), 'data')
 messages = ['Thanks', 'We\'re using secure md5 password hashing now', 
-    'Login is no longer vulnerable to SQLi', 'No more script execution']
+    'Login is no longer vulnerable to SQLi', 'No more script execution',
+    'Registration is no longer vulnerable to SQLi',
+    'Go to /rarecandy/N to pick your level']
 
 @app.before_request
 def setup():
@@ -33,7 +35,7 @@ def index():
     try:
         user_id = flask.session['user_id']
     except KeyError:
-        return index_html % messages[flask.session['level']]
+        return index_html % messages[max(0, min(flask.session['level'], len(messages)))]
     else:
         if user_id == 1:
             flask.session['level'] += 1
@@ -93,6 +95,8 @@ def login():
                 cursor.execute(query)
             except sqlite3.OperationalError:
                 return 'Error in sql statement:<br>%s<br><a href=/>Go back.</a>\n' % query
+            except sqlite3.Warning as e:
+                return '%s <a href=/register>Go back.</a>\n' % e
 
         res = cursor.fetchone()
         cursor.close()
@@ -127,7 +131,12 @@ def register_post():
         cursor = conn.cursor()
 
         query = 'SELECT id FROM passwords WHERE username=?'
-        cursor.execute(query, (username,))
+        try:
+            cursor.execute(query, (username,))
+        except sqlite3.OperationalError:
+            return 'Error in sql statement:<br>%s<br><a href=/register>Go back.</a>\n' % query
+        except sqlite3.Warning as e:
+            return '%s <a href=/register>Go back.</a>\n' % e
 
         if cursor.fetchone():
             return 'Username is already taken\n'
