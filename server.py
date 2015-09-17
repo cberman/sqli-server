@@ -56,6 +56,11 @@ def rarecandy(level):
     flask.session['level'] = int(level)
     return flask.redirect('/')
 
+@app.route('/reset')
+def reset():
+    del flask.session['db']
+    return flask.redirect('/')
+
 @app.route('/logout')
 def logout():
     flask.session.pop('user_id', None)
@@ -155,6 +160,8 @@ def register_post():
     return 'Registered successfully.  Click <a href=/>here</a> to be logged in.\n'
 
 def main():
+    if not os.path.exists(data_dir):
+        os.makedirs(data_dir)
     if not os.path.exists(os.path.join(data_dir, 'entropy.dat')):
         with open(os.path.join(data_dir, 'entropy.dat'), 'w') as f:
             f.write(os.urandom(24))
