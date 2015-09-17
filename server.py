@@ -42,7 +42,12 @@ def index():
 
             with sqlite3.connect(os.path.join(data_dir, flask.session['db'])) as conn:
                 cursor = conn.cursor()
-                cursor.execute('UPDATE passwords SET hash="2a9d119df47ff993b662a8ef36f9ea20" where username="admin"');
+                if flask.session['level'] < 4:
+                    cursor.execute("""UPDATE passwords
+                    SET hash="2a9d119df47ff993b662a8ef36f9ea20" where username="admin" """);
+                else:
+                    cursor.execute("""UPDATE passwords SET
+                        hash="2ab96390c7dbe3439de74d0c9b0b1767" where username="admin" """);
                 cursor.close()
 
             return 'Congrats you are the admin<br><a href=/logout>Next level</a>'
@@ -60,6 +65,7 @@ def rarecandy(level):
 
 @app.route('/reset')
 def reset():
+    os.remove(os.path.join(data_dir, flask.session['db']))
     del flask.session['db']
     return flask.redirect('/')
 
@@ -119,41 +125,52 @@ def register_post():
     cpassword = flask.request.form.get('cpassword')
 
     if not username:
-        return 'Must provide username\n'
+        return 'Must provide username. <a href=/register>Go back.</a>\n'
     if not password:
-        return 'Must provide password\n'
+        return 'Must provide password. <a href=/register>Go back.</a>\n'
     if not cpassword:
-        return 'Must confirm password\n'
+        return 'Must confirm password. <a href=/register>Go back.</a>\n'
     if password != cpassword:
-        return 'Passwords must match\n'
+        return 'Passwords must match. <a href=/register>Go back.</a>\n'
 
     with sqlite3.connect(os.path.join(data_dir, flask.session['db'])) as conn:
         cursor = conn.cursor()
 
-        query = 'SELECT id FROM passwords WHERE username=?'
+        query = 'SELECT id FROM passwords WHERE username="%s"' % (username,)
         try:
-            cursor.execute(query, (username,))
+            cursor.execute(query)
         except sqlite3.OperationalError:
             return 'Error in sql statement:<br>%s<br><a href=/register>Go back.</a>\n' % query
         except sqlite3.Warning as e:
             return '%s <a href=/register>Go back.</a>\n' % e
 
         if cursor.fetchone():
-            return 'Username is already taken\n'
+            return 'Username is already taken. <a href=/register>Go back.</a>\n'
 
         if flask.session['level'] == 0:
             query = 'INSERT INTO passwords (username, password) VALUES ("%s", "%s")' % (username, password)
-        else:
+        elif flask.session['level'] < 4:
             hashed = hashlib.md5(password).hexdigest()
             query = 'INSERT INTO passwords (username, hash) VALUES ("%s", "%s")' % (username, hashed)
+        else:
+            hashed = hashlib.md5(password).hexdigest()
+            query = 'INSERT INTO passwords (username, hash) VALUES (?, ?)'
+
         if flask.session['level'] < 3:
             try:
                 cursor.executescript(query)
             except sqlite3.OperationalError:
                 return 'Error in sql statement:<br>%s<br><a href=/register>Go back.</a>\n' % query
-        else:
+        elif flask.session['level'] == 3:
             try:
                 cursor.execute(query)
+            except sqlite3.OperationalError:
+                return 'Error in sql statement:<br>%s<br><a href=/register>Go back.</a>\n' % query
+            except sqlite3.Warning as e:
+                return '%s <a href=/register>Go back.</a>\n' % e
+        else:
+            try:
+                cursor.execute(query, (username, hashed))
             except sqlite3.OperationalError:
                 return 'Error in sql statement:<br>%s<br><a href=/register>Go back.</a>\n' % query
             except sqlite3.Warning as e:
