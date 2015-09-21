@@ -4,11 +4,8 @@ import sqlite3
 import hashlib
 
 app = flask.Flask(__name__)
-html_dir = os.path.join(os.path.dirname(__file__), 'html')
-index_html = open(os.path.join(html_dir, 'index.html')).read()
-register_html = open(os.path.join(html_dir, 'register.html')).read()
 data_dir = os.path.join(os.path.dirname(__file__), 'data')
-messages = ['Thanks', 'We\'re using secure md5 password hashing now', 
+messages = ['Thanks', 'We\'re using secure md5 password hashing now',
     'Login is no longer vulnerable to SQLi', 'No more script execution']
 
 @app.before_request
@@ -33,7 +30,7 @@ def index():
     try:
         user_id = flask.session['user_id']
     except KeyError:
-        return index_html % messages[flask.session['level']]
+        return flask.render_template("index.html", message=messages[flask.session['level']])
     else:
         if user_id == 1:
             flask.session['level'] += 1
@@ -58,7 +55,12 @@ def rarecandy(level):
 
 @app.route('/reset')
 def reset():
-    del flask.session['db']
+    try:
+        os.remove(flask.session['db'])
+        del flask.session['db']
+        flask.session['level'] = 0
+    except:
+        pass
     return flask.redirect('/')
 
 @app.route('/logout')
@@ -106,7 +108,7 @@ def login():
 
 @app.route('/register', methods=['GET'])
 def register_get():
-    return register_html
+    return flask.render_template("register.html")
 
 @app.route('/register', methods=['POST'])
 def register_post():
@@ -159,13 +161,6 @@ def register_post():
 
     return 'Registered successfully.  Click <a href=/>here</a> to be logged in.\n'
 
-def main():
-    if not os.path.exists(data_dir):
-        os.makedirs(data_dir)
-    if not os.path.exists(os.path.join(data_dir, 'entropy.dat')):
-        with open(os.path.join(data_dir, 'entropy.dat'), 'w') as f:
-            f.write(os.urandom(24))
-    app.secret_key = open(os.path.join(data_dir, 'entropy.dat')).read()
+if __name__ == '__main__':
+    app.secret_key = os.urandom(24)
     app.run(host='0.0.0.0', port=8080, debug=True)
-
-if __name__ == '__main__': main()
