@@ -30,7 +30,7 @@ def index():
     try:
         user_id = flask.session['user_id']
     except KeyError:
-        return flask.render_template("index.html", message=messages[flask.session['level']])
+        return flask.render_template("sqli/index.html", message=messages[flask.session['level']])
     else:
         if user_id == 1:
             flask.session['level'] += 1
@@ -108,7 +108,7 @@ def login():
 
 @app.route('/register', methods=['GET'])
 def register_get():
-    return flask.render_template("register.html")
+    return flask.render_template("sqli/register.html")
 
 @app.route('/register', methods=['POST'])
 def register_post():
