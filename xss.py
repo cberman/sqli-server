@@ -1,7 +1,9 @@
-import flask
+#!/usr/bin/env python
+
+from flask import Flask, redirect, render_template, session, request
 import os
 
-app = flask.Flask(__name__)
+app = Flask(__name__)
 
 @app.after_request
 def after_request(response):
@@ -10,45 +12,69 @@ def after_request(response):
 
 @app.route('/')
 def index():
-    if 'level' in flask.session:
-        return flask.redirect('/level/%s' % flask.session['level'])
+    if 'level' in session:
+        return redirect('/level/%s' % session['level'])
 
-    return flask.render_template("xss/index.html")
+    return render_template("xss/index.html")
 
 @app.route('/level')
 def levelbasic():
-    return flask.redirect("/")
+    return redirect("/")
 
 @app.route('/level/<int:level>')
 def levelroute(level):
 
     # Check if the user has a level
-    if 'level' not in flask.session:
-        flask.session['level'] = 1
-        return flask.redirect("/level/1")
+    if 'level' not in session:
+        session['level'] = 1
+        return redirect("/level/1")
 
     # Check if it's a valid level
     if level not in xrange(1, 5):
-        return flask.redirect("/")
+        return redirect("/")
 
     # Has the user unlocked the level?
-    if flask.session['level'] < level:
-        return flask.redirect("/%s" % flask.session['level'])
+    if session['level'] < level:
+        return redirect("/%s" % session['level'])
 
-    return flask.render_template("xss/level/%s.html" % level)
+    return render_template("xss/level/%s/index.html" % level)
 
 @app.route('/rarecandy/<level>')
 def rarecandy(level):
-    flask.session['level'] = int(level)
-    return flask.redirect('/level/%s' % level)
+    session['level'] = int(level)
+    return redirect("/level/%s" % level)
 
 @app.route('/reset')
 def reset():
     try:
-        del flask.session['level']
+        del session['level']
     except:
         pass
-    return flask.redirect('/')
+    return redirect('/')
+
+@app.route('/advance', methods=['GET'])
+def advance():
+
+    if request.headers.get("Referer"):
+        current = request.headers.get("Referer")[-1]
+        if int(current) in xrange(1, 5):
+            try:
+                session['level'] = int(current) + 1
+                return redirect("/level/%s" % session['level'])
+            except:
+                pass
+
+    return redirect("/")
+
+# Challenges
+@app.route('/submit/1', methods=['POST'])
+def submit1():
+    try:
+        search_term = request.form['search']
+    except:
+        return redirect("/1")
+
+    return render_template("xss/level/1/search.html", search_term = search_term)
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(24)

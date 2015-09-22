@@ -1,0 +1,13 @@
+<html>
+<head>
+<title>Googly Online Search - {{ search_term }}</title>
+<!-- Internal game script, not part of challenge! -->
+<script src="{{ url_for('static', filename='xss/game.js') }}"></script>
+</head>
+<body>
+<h1>Welcome to the <b>Googly Online Search Engine</b></h1>
+<p>Please type in your search term below to search the internet!</p>
+<p><h3><b>No results found for:</b> {{ search_term | safe }}</h3></p>
+<small>* Not actually very good at searching</small>
+</body>
+</html>
