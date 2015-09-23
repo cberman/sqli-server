@@ -15,7 +15,7 @@ messages = ['Thanks', 'We\'re using secure md5 password hashing now',
 
 @app.before_request
 def setup():
-    if 'db' not in flask.session:
+    if not('db' in flask.session and os.path.isfile(flask.session['db'])):
         flask.session['db'] = os.urandom(8).encode('hex')+'.db'
         flask.session['level'] = 0
         with sqlite3.connect(os.path.join(data_dir, flask.session['db'])) as conn:
