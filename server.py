@@ -102,7 +102,7 @@ def login():
             except sqlite3.OperationalError:
                 return 'Error in sql statement:<br>%s<br><a href=/>Go back.</a>\n' % query
             except sqlite3.Warning as e:
-                return '%s <a href=/register>Go back.</a>\n' % e
+                return '%s <a href=/>Go back.</a>\n' % e
 
         res = cursor.fetchone()
         cursor.close()
@@ -136,9 +136,9 @@ def register_post():
     with sqlite3.connect(os.path.join(data_dir, flask.session['db'])) as conn:
         cursor = conn.cursor()
 
-        query = 'SELECT id FROM passwords WHERE username="%s"' % (username,)
+        query = 'SELECT id FROM passwords WHERE username=?'
         try:
-            cursor.execute(query)
+            cursor.execute(query, (username,))
         except sqlite3.OperationalError:
             return 'Error in sql statement:<br>%s<br><a href=/register>Go back.</a>\n' % query
         except sqlite3.Warning as e:
