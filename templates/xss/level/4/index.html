@@ -1,0 +1,23 @@
+<html>
+<head>
+<title>Googly Online Search</title>
+<!-- Internal game script, not part of challenge! -->
+<script src="{{ url_for('static', filename='xss/game.js') }}"></script>
+<script>
+function search() {
+	prompt("hey");
+}
+</script>
+</head>
+<body>
+<h1>Welcome to the <b>Googly Online Search Engine</b></h1>
+<p><b>New!</b> Search results show up live on this page</p>
+<p>Please type in your search term below to search the internet!</p>
+<form action="#" onsubmit="return search()">
+	<input type="text" name="search" />
+	<input type="submit" />
+</form>
+<p id="results"></p>
+<small>* Not actually very good at searching</small>
+</body>
+</html>
