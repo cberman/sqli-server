@@ -1,0 +1,18 @@
+<html>
+<head>
+<title>Foobar Online Search</title>
+<!-- Internal game script, not part of challenge! -->
+<script src="{{ url_for('static', filename='xss/game.js') }}"></script>
+</head>
+<body>
+<p><a href="/level/5">back to index</a></p>
+<h1>Welcome to the <b>Foobar Online Search Engine</b></h1>
+<p><b>{{ message if message is defined else '' }}</b></p>
+<p id="page-text">Change your username here</p>
+</div>
+<form id="searchform" action="/submit/5" method="POST">
+	<input type="text" name="username" id="username">
+	<input type="submit" value="Submit">
+</form>
+</body>
+</html>

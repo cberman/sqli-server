@@ -30,7 +30,7 @@ def levelroute(level):
         return redirect("/level/1")
 
     # Check if it's a valid level
-    if level not in xrange(1, 5):
+    if level not in xrange(1, 7):
         return redirect("/")
 
     # Has the user unlocked the level?
@@ -48,6 +48,7 @@ def rarecandy(level):
 def reset():
     try:
         del session['level']
+        session.clear()
     except:
         pass
     return redirect('/')
@@ -57,7 +58,11 @@ def advance():
 
     if request.headers.get("Referer"):
         current = request.headers.get("Referer")[-1]
-        if int(current) in xrange(1, 5):
+        if int(current) == 7:
+            # User completed all the levels
+            return "Congratulations, you finished all the XSS challenges!"
+
+        if int(current) in xrange(1, 7):
             try:
                 session['level'] = int(current) + 1
                 return redirect("/level/%s" % session['level'])
@@ -100,6 +105,18 @@ def submit3():
     return render_template("xss/level/3/search.html", search_term = search_term)
 
 # Challenge 4 doesn't have a server handler (hash-based XSS)
+
+@app.route('/submit/5', methods=['GET', 'POST'])
+def submit5():
+    if request.method == 'POST':
+        try:
+            newuser = request.form['username']
+            session['username'] = newuser
+            return render_template("xss/level/5/changeuser.html", message="Username changed successfully!")
+        except:
+            pass
+
+    return render_template("xss/level/5/changeuser.html")
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(24)

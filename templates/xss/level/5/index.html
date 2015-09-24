@@ -5,9 +5,10 @@
 <script src="{{ url_for('static', filename='xss/game.js') }}"></script>
 </head>
 <body>
-<p><a href="#index" onclick="changepage('index')">index</a> | <a href="#about" onclick="changepage('about')">about</a></p>
+<p>You are logged in as <b>{{ (session.username if session.username is defined else "foobar123") | safe}}</b></p>
+<p><a href="#index" onclick="changepage('index')">index</a> | <a href="#about" onclick="changepage('about')">about</a> | <a href="/submit/5"> change username</a></p>
 <h1>Welcome to the <b>Foobar Online Search Engine</b></h1>
-<p id="page-text"><b>New!</b> Search results show up live on this page<br />
+<p id="page-text"><b>New!</b> We now have accounts so users can track their previous searches<br />
 Please type in your search term below to search the internet!</p>
 </div>
 <form id="searchform" enctype="multipart/form-data" onsubmit="return search();">
@@ -25,7 +26,7 @@ function search() {
 function changepage(newpage) {
 	if (newpage == "about") {
 		document.getElementById("page-text").innerHTML = "You are on: " + newpage + "<br /> Foobar Online Search is a state of the art search engine for searching the internet!";
-	} else {
+	} else if (newpage == "index") {
 		document.getElementById("page-text").innerHTML = "You are on: " + newpage + "<br /> <b>New!</b> Search results show up live on this page<br /> Please type in your search term below to search the internet!";
 	}
 }
