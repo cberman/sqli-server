@@ -1,0 +1,10 @@
+1. Straightforward XSS
+2. Removes <script> tags
+3. Removes <script> tags for real
+4. Searching can't inject, but new URL Hash...
+5. Stored XSS (username)
+6. Image injection in profile pic upload (javascript: url)
+7. Inject without using script tag, ', ", or javascript:
+
+
+(Remove ' and " (use Grave accents ` instead) )???
