@@ -5,8 +5,7 @@
     <body>
         <p>
             Make an account but don't login as admin</p>
-        <p>
-            %s</p>
+        <p>{{ message | safe }}</p>
         <br>
         <form action="/login" method="post">
             Username: <input type="text" name="username" /><br />
