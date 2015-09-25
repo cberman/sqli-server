@@ -6,6 +6,7 @@ import sqlite3
 import hashlib
 
 app = flask.Flask(__name__)
+app.secret_key = os.getenv('SQLI_SECRET_KEY', "CHANGEMEDONOTUSE")
 data_dir = os.path.join(os.path.dirname(__file__), 'data')
 messages = ['Thanks', 'We\'re using secure md5 password hashing now',
     'Login is no longer vulnerable to SQLi', 'No more script execution']
@@ -190,5 +191,4 @@ def register_post():
     return 'Registered successfully.  Click <a href=/>here</a> to be logged in.\n'
 
 if __name__ == '__main__':
-    app.secret_key = os.urandom(24)
     app.run(host='0.0.0.0', port=8080, debug=True)
