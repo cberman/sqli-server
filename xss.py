@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 
 from flask import Flask, redirect, render_template, session, request
-import os, re
+import os, re, logging
 
 app = Flask(__name__)
+app.secret_key = os.getenv('XSS_SECRET_KEY', "CHANGEMEDONOTUSE")
+stream_handler = logging.StreamHandler()
+stream_handler.setLevel(logging.INFO)
+app.logger.addHandler(stream_handler)
 
 @app.after_request
 def after_request(response):
@@ -119,5 +123,4 @@ def submit5():
     return render_template("xss/level/5/changeuser.html")
 
 if __name__ == '__main__':
-    app.secret_key = os.urandom(24)
     app.run(host='0.0.0.0', port=8888, debug=True)

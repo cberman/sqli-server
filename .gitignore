@@ -3,5 +3,5 @@ lib
 include
 venv
 data/
-
+*.pyc
 .DS_Store
