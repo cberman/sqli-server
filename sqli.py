@@ -191,4 +191,4 @@ def register_post():
     return 'Registered successfully.  Click <a href=/>here</a> to be logged in.\n'
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080, debug=True)
+    app.run(host='0.0.0.0', port=8080, debug=False)
