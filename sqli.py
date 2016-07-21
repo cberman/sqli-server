@@ -16,6 +16,8 @@ def setup():
     if not('db' in flask.session and os.path.isfile(flask.session['db'])):
         flask.session['db'] = os.urandom(8).encode('hex')+'.db'
         flask.session['level'] = 0
+        if not os.path.exists(data_dir):
+            os.makedirs(data_dir)
         with sqlite3.connect(os.path.join(data_dir, flask.session['db'])) as conn:
             cursor = conn.cursor()
             cursor.execute("""CREATE TABLE IF NOT EXISTS passwords(
