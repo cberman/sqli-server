@@ -6,6 +6,7 @@ import sqlite3
 import hashlib
 
 app = flask.Flask(__name__)
+application = app
 app.secret_key = os.getenv('SQLI_SECRET_KEY', "CHANGEMEDONOTUSE")
 data_dir = os.path.join(os.path.dirname(__file__), 'data')
 messages = ['Thanks', 'We\'re using secure md5 password hashing now',
